@@ -18,35 +18,46 @@ map<Character, string> fileNames = {
 // 読み上げる文章を設定
 Character input[] = {KO0, N0, NI0, TI0, WA0};
 
+ofImage images[WA0];
 ofSoundPlayer players[WA0];
+int current = 0;
 //--------------------------------------------------------------
 // 起動時に一度呼ばれる
-// 音声ファイルをロード
 void ofApp::setup() {
   for (int i = 0; i < WA0; i++) {
-    string dirName = "sounds/";
     string fileName = fileNames[Character(i + 1)];
-    players[i].load(dirName + fileName + ".wav");
+
+    // 画像ファイルをロード
+    string imageDirName = "images/";
+    images[i].load(imageDirName + fileName + ".png");
+
+    // 音声ファイルをロード
+    string soundDirName = "sounds/";
+    players[i].load(soundDirName + fileName + ".wav");
     players[i].setMultiPlay(false);
   }
+
+  players[input[current] - 1].play();
 }
 
-int i = 0;
 //--------------------------------------------------------------
 // 起動中繰り返し呼ばれる
 void ofApp::update() {
-  if (i == 0 || !players[input[i - 1] - 1].isPlaying()) {
+  if (!players[input[current] - 1].isPlaying()) {
+    current++;
     // 最後の文字までいったら最初に戻る
-    if (i >= sizeof(input) / sizeof(input[0])) {
-      i = 0;
+    if (current >= sizeof(input) / sizeof(input[0])) {
+      current = 0;
     }
-    players[input[i] - 1].play();
-    i++;
+    players[input[current] - 1].play();
   }
 }
 
 //--------------------------------------------------------------
-void ofApp::draw() {}
+void ofApp::draw() {
+  cout << current << endl;
+  images[input[current] - 1].draw(0, 0, ofGetWidth(), ofGetHeight());
+}
 
 //--------------------------------------------------------------
 void ofApp::exit() {}
