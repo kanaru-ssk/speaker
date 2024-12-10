@@ -2,6 +2,7 @@
 
 #include <string>
 
+// 全ての顔に整数連番のidを付与
 enum Character {
   KO0 = 1,
   N0,
@@ -10,35 +11,37 @@ enum Character {
   WA0,
 };
 
-map<Character, string> fileNames = {{KO0, "ko-0-1"},
-                                    {N0, "n-0-2"},
-                                    {NI0, "ni-0-3"},
-                                    {TI0, "ti-0-4"},
-                                    {WA0, "wa-0-5"}};
+// 各idに紐づくファイル名を設定
+map<Character, string> fileNames = {
+    {KO0, "ko_1"}, {N0, "N_1"}, {NI0, "ni_1"}, {TI0, "ti_1"}, {WA0, "wa_1"}};
 
+// 読み上げる文章を設定
 Character input[] = {KO0, N0, NI0, TI0, WA0};
-ofSoundPlayer players[sizeof(input) / sizeof(input[0])];
 
+ofSoundPlayer players[WA0];
 //--------------------------------------------------------------
+// 起動時に一度呼ばれる
+// 音声ファイルをロード
 void ofApp::setup() {
-  for (int i = 0; i < sizeof(input) / sizeof(input[0]); i++) {
+  for (int i = 0; i < WA0; i++) {
     string dirName = "sounds/";
     string fileName = fileNames[Character(i + 1)];
-    players[i].load(dirName + fileName + ".mp3");
+    players[i].load(dirName + fileName + ".wav");
     players[i].setMultiPlay(false);
   }
 }
 
-//--------------------------------------------------------------
 int i = 0;
+//--------------------------------------------------------------
+// 起動中繰り返し呼ばれる
 void ofApp::update() {
-  if (i == 0 || !players[i - 1].isPlaying()) {
-    cout << i << fileNames[Character(i + 1)] << endl;
-    players[input[i]].play();
-    i++;
+  if (i == 0 || !players[input[i - 1] - 1].isPlaying()) {
+    // 最後の文字までいったら最初に戻る
     if (i >= sizeof(input) / sizeof(input[0])) {
       i = 0;
     }
+    players[input[i] - 1].play();
+    i++;
   }
 }
 
