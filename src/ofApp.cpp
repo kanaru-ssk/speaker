@@ -9,6 +9,7 @@ enum Character {
   NI0,
   TI0,
   WA0,
+  LAST,
 };
 
 // 各idに紐づくファイル名を設定
@@ -19,8 +20,8 @@ map<Character, string> fileNames = {
 Character input[] = {KO0, N0, NI0, TI0, WA0};
 const int INPUT_SIZE = sizeof(input) / sizeof(input[0]);
 
-ofImage images[WA0];
-ofSoundPlayer players[WA0];
+ofImage images[LAST];
+ofSoundPlayer players[LAST];
 int current = 0;
 
 const float FADE_POINT = 0.1;
@@ -37,7 +38,7 @@ float crossFade(float volume) {
 //--------------------------------------------------------------
 // 起動時に一度呼ばれる
 void ofApp::setup() {
-  for (int i = 0; i < WA0; i++) {
+  for (int i = 0; i < LAST; i++) {
     string fileName = fileNames[Character(i + 1)];
 
     // 画像ファイルをロード
