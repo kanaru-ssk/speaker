@@ -22,6 +22,18 @@ const int INPUT_SIZE = sizeof(input) / sizeof(input[0]);
 ofImage images[WA0];
 ofSoundPlayer players[WA0];
 int current = 0;
+
+const float FADE_POINT = 0.1;
+
+float crossFade(float volume) {
+  if (volume < FADE_POINT) {
+    return 2 * volume;
+  } else if (volume > 1 - FADE_POINT) {
+    return -2 * volume + 2;
+  }
+  return 1;
+}
+
 //--------------------------------------------------------------
 // 起動時に一度呼ばれる
 void ofApp::setup() {
@@ -44,7 +56,12 @@ void ofApp::setup() {
 //--------------------------------------------------------------
 // 起動中繰り返し呼ばれる
 void ofApp::update() {
-  if (!players[input[current] - 1].isPlaying()) {
+  int next = current + 1;
+  if (next >= INPUT_SIZE) {
+    next = 0;
+  }
+  if (!players[input[next] - 1].isPlaying() &&
+      players[input[current] - 1].getPosition() >= 1 - FADE_POINT) {
     current++;
     // 最後の文字までいったら最初に戻る
     if (current >= INPUT_SIZE) {
@@ -52,6 +69,10 @@ void ofApp::update() {
     }
     players[input[current] - 1].play();
   }
+  players[input[current] - 1].setVolume(
+      crossFade(players[input[current] - 1].getPosition()));
+  players[input[next] - 1].setVolume(
+      crossFade(players[input[next] - 1].getPosition()));
 }
 
 //--------------------------------------------------------------
