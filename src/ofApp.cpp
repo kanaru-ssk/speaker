@@ -9,8 +9,9 @@ enum Character {
   NI0,
   TI0,
   WA0,
-  LAST,
 };
+
+const int LAST = WA0;
 
 // 各idに紐づくファイル名を設定
 map<Character, string> fileNames = {
