@@ -17,6 +17,7 @@ map<Character, string> fileNames = {
 
 // 読み上げる文章を設定
 Character input[] = {KO0, N0, NI0, TI0, WA0};
+const int INPUT_SIZE = sizeof(input) / sizeof(input[0]);
 
 ofImage images[WA0];
 ofSoundPlayer players[WA0];
@@ -46,7 +47,7 @@ void ofApp::update() {
   if (!players[input[current] - 1].isPlaying()) {
     current++;
     // 最後の文字までいったら最初に戻る
-    if (current >= sizeof(input) / sizeof(input[0])) {
+    if (current >= INPUT_SIZE) {
       current = 0;
     }
     players[input[current] - 1].play();
@@ -55,7 +56,13 @@ void ofApp::update() {
 
 //--------------------------------------------------------------
 void ofApp::draw() {
-  cout << current << endl;
+  int next = current + 1;
+  if (next >= INPUT_SIZE) {
+    next = 0;
+  }
+  ofSetColor(255, 255);
+  images[input[next] - 1].draw(0, 0, ofGetWidth(), ofGetHeight());
+  ofSetColor(255, 255 * (1.5 - players[input[current] - 1].getPosition()));
   images[input[current] - 1].draw(0, 0, ofGetWidth(), ofGetHeight());
 }
 
