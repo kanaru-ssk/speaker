@@ -4,14 +4,12 @@
 
 // 全ての顔に整数連番のidを付与
 enum Character {
-  KO0 = 1,
+  KO0,
   N0,
   NI0,
   TI0,
   WA0,
 };
-
-const int LAST = WA0;
 
 // 各idに紐づくファイル名を設定
 map<Character, string> fileNames = {
@@ -21,9 +19,8 @@ map<Character, string> fileNames = {
 Character input[] = {KO0, N0, NI0, TI0, WA0};
 const int INPUT_SIZE = sizeof(input) / sizeof(input[0]);
 
-ofImage images[LAST];
-ofSoundPlayer players[LAST];
-int current = 0;
+ofImage images[2];
+ofSoundPlayer players[2];
 
 const float FADE_POINT = 0.1;
 
@@ -36,23 +33,32 @@ float crossFade(float volume) {
   return 1;
 }
 
+int getNextPlayer(int playing) {
+  // playing = 0 -> next = 1
+  // playing = 1 -> next = 0
+  return 1 - playing;
+}
+
+void loadFile(int index, ofImage *image, ofSoundPlayer *player) {
+  // 画像ファイルをロード
+  string imageDirName = "images/";
+  image->load(imageDirName + fileNames[input[index]] + ".png");
+
+  // 音声ファイルをロード
+  string soundDirName = "sounds/";
+  player->load(soundDirName + fileNames[input[index]] + ".wav");
+}
+
+int current = 0;
+int playing = 0;
+
 //--------------------------------------------------------------
 // 起動時に一度呼ばれる
 void ofApp::setup() {
-  for (int i = 0; i < LAST; i++) {
-    string fileName = fileNames[Character(i + 1)];
-
-    // 画像ファイルをロード
-    string imageDirName = "images/";
-    images[i].load(imageDirName + fileName + ".png");
-
-    // 音声ファイルをロード
-    string soundDirName = "sounds/";
-    players[i].load(soundDirName + fileName + ".wav");
-    players[i].setMultiPlay(false);
-  }
-
-  players[input[current] - 1].play();
+  // 画像ファイルをロード
+  string imageDirName = "images/";
+  loadFile(current, &images[playing], &players[playing]);
+  players[playing].play();
 }
 
 //--------------------------------------------------------------
@@ -62,19 +68,21 @@ void ofApp::update() {
   if (next >= INPUT_SIZE) {
     next = 0;
   }
-  if (!players[input[next] - 1].isPlaying() &&
-      players[input[current] - 1].getPosition() >= 1 - FADE_POINT) {
+  if (!players[getNextPlayer(playing)].isPlaying() &&
+      players[playing].getPosition() >= 1 - FADE_POINT) {
     current++;
     // 最後の文字までいったら最初に戻る
     if (current >= INPUT_SIZE) {
       current = 0;
     }
-    players[input[current] - 1].play();
+    playing = getNextPlayer(playing);
+
+    loadFile(current, &images[playing], &players[playing]);
+    players[playing].play();
   }
-  players[input[current] - 1].setVolume(
-      crossFade(players[input[current] - 1].getPosition()));
-  players[input[next] - 1].setVolume(
-      crossFade(players[input[next] - 1].getPosition()));
+  players[playing].setVolume(crossFade(players[playing].getPosition()));
+  players[getNextPlayer(playing)].setVolume(
+      crossFade(players[getNextPlayer(playing)].getPosition()));
 }
 
 //--------------------------------------------------------------
@@ -84,9 +92,9 @@ void ofApp::draw() {
     next = 0;
   }
   ofSetColor(255, 255);
-  images[input[next] - 1].draw(0, 0, ofGetWidth(), ofGetHeight());
-  ofSetColor(255, 255 * (1.5 - players[input[current] - 1].getPosition()));
-  images[input[current] - 1].draw(0, 0, ofGetWidth(), ofGetHeight());
+  images[getNextPlayer(playing)].draw(0, 0, ofGetWidth(), ofGetHeight());
+  ofSetColor(255, 255 * (1.5 - players[playing].getPosition()));
+  images[playing].draw(0, 0, ofGetWidth(), ofGetHeight());
 }
 
 //--------------------------------------------------------------
