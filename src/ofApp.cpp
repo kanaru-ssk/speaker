@@ -58,6 +58,8 @@ void ofApp::setup() {
   // 画像ファイルをロード
   string imageDirName = "images/";
   loadFile(current, &images[playing], &players[playing]);
+  loadFile(current + 1, &images[getNextPlayer(playing)],
+           &players[getNextPlayer(playing)]);
   players[playing].play();
 }
 
@@ -68,6 +70,13 @@ void ofApp::update() {
   if (next >= INPUT_SIZE) {
     next = 0;
   }
+
+  for (int i = 0; i < 2; i++) {
+    if (players[i].getPosition() == 1) {
+      loadFile(next, &images[i], &players[i]);
+    }
+  }
+
   if (!players[getNextPlayer(playing)].isPlaying() &&
       players[playing].getPosition() >= 1 - FADE_POINT) {
     current++;
@@ -77,7 +86,6 @@ void ofApp::update() {
     }
     playing = getNextPlayer(playing);
 
-    loadFile(current, &images[playing], &players[playing]);
     players[playing].play();
   }
   players[playing].setVolume(crossFade(players[playing].getPosition()));
