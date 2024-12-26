@@ -22,7 +22,7 @@ const int INPUT_SIZE = sizeof(input) / sizeof(input[0]);
 ofImage images[2];
 ofSoundPlayer players[2];
 
-const float FADE_POINT = 0.1;
+const float FADE_POINT = 0.4;
 
 float crossFade(float volume) {
   if (volume < FADE_POINT) {
@@ -101,7 +101,7 @@ void ofApp::draw() {
   }
   ofSetColor(255, 255);
   images[getNextPlayer(playing)].draw(0, 0, ofGetWidth(), ofGetHeight());
-  ofSetColor(255, 255 * (1.5 - players[playing].getPosition()));
+  ofSetColor(255, 255 * 1.7 * (1 - players[playing].getPosition()));
   images[playing].draw(0, 0, ofGetWidth(), ofGetHeight());
 }
 
